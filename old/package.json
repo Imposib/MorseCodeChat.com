@@ -1,0 +1,7 @@
+{
+  "name": "morse chat",
+  "version": "1.0.0",
+  "dependencies": {
+    "pusher-js": "^4.1.0"
+  }
+}

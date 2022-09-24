@@ -1,0 +1,10 @@
+eventlet
+Flask==2.0.3
+Werkzeug==2.0.3
+Flask-Login
+Flask-Session
+Flask-SQLAlchemy
+Flask-Pusher
+mariadb
+argon2-cffi
+flask-expects-json

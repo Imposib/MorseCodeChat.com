@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-flask
+  namespace: morse
+  labels:
+    app: nginx-flask
+spec:
+  selector:
+    matchLabels:
+      app: nginx-flask
+  replicas: 1
+  revisionHistoryLimit: 3
+  template:
+    metadata:
+      labels:
+        app: nginx-flask
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: nginx-flask
+          image: ghcr.io/robalb/morsechat:sha-7190667585f9244b1d23b94839097255c9a491d2
+          env:
+            - name: MARIADB_HOST
+              value: mariadb
+            - name: MARIADB_USER
+              value: morse_prod
+            - name: MARIADB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: morse-secrets
+                  key: MARIADB_PASSWORD
+            - name: MARIADB_DATABASE
+              value: morsechat
+            - name: PUSHER_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: morse-secrets
+                  key: PUSHER_APP_ID
+            - name: PUSHER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: morse-secrets
+                  key: PUSHER_KEY
+            - name: PUSHER_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: morse-secrets
+                  key: PUSHER_SECRET
+            - name: PUSHER_CLUSTER
+              value: eu
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - '-X POST'
+                - http://localhost/api/v1/page_init?k8s-liveness-probe
+            timeoutSeconds: 2
+            initialDelaySeconds: 5
+            periodSeconds: 60
